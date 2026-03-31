@@ -1,0 +1,76 @@
+import React, { useState } from "react";
+import { TextField, Button } from "@mui/material";
+import { useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+
+// ✅ ACTIONS
+import { createIngredientCategory, getIngredientCategory } from "../../State/Admin/Ingredients/Action";
+
+const CreateIngredientCategoryForm = ({ handleClose }) => {
+  const { id } = useParams();
+  const dispatch = useDispatch();
+  const { auth, restaurant } = useSelector((store) => store);
+
+  const jwt = localStorage.getItem("jwt");
+
+  const [formData, setFormData] = useState({
+    name: "",
+  });
+
+  const handleFormSubmit = (event) => {
+    event.preventDefault();
+
+    const data = {
+      name: formData.name,
+      restaurantId: restaurant?.usersRestaurant?.id,
+    };
+
+    // ✅ CREATE CATEGORY
+    dispatch(createIngredientCategory({ data, jwt: auth?.jwt || jwt }));
+
+    // ✅ REFRESH CATEGORY LIST (MAIN FIX)
+    setTimeout(() => {
+      dispatch(getIngredientCategory(jwt));
+    }, 300);
+
+    // reset form
+    setFormData({ name: "" });
+
+    handleClose();
+  };
+
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
+
+  return (
+    <div>
+      <div className="p-5">
+        <h1 className="text-gray-400 text-center text-xl pb-10">
+          Create Ingredient Category
+        </h1>
+
+        <form className="space-y-5" onSubmit={handleFormSubmit}>
+          <TextField
+            label="Category Name"
+            name="name"
+            value={formData.name}
+            onChange={handleInputChange}
+            fullWidth
+            required
+          />
+
+          <Button type="submit" variant="contained" color="primary" fullWidth>
+            Create
+          </Button>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+export default CreateIngredientCategoryForm;

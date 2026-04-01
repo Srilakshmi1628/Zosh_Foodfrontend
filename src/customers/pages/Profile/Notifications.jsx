@@ -10,7 +10,7 @@ const Notifications = () => {
 
   useEffect(() => {
     dispatch(getUsersNotificationAction());
-  }, []);
+  }, [dispatch]);
 
   return (
     <div className="space-y-5 px-5 lg:px-20">
